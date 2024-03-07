@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>Land-io Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+        }
+        #gameContainer {
+            position: relative;
+        }
+        #gameCanvas {
+            border: 1px solid black;
+        }
+        #playerList {
+            width: 200px;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+<div id="gameContainer">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+</div>
+<div id="playerList">
+    <h2>Players</h2>
+    <ul id="playerListItems"></ul>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const playerListItems = document.getElementById('playerListItems');
+
+    const players = {};
+    const squareSize = 20;
+    let currentDirection = '';
+
+    // Generate a unique random color for each player
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        do {
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+        } while (Object.values(players).includes(color));
+        return color;
+    }
+
+    // Render the game state on the canvas
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the grid
+        ctx.strokeStyle = 'lightgray';
+        ctx.lineWidth = 0.5;
+        for (let x = 0; x <= canvas.width; x += squareSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y <= canvas.height; y += squareSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+
+        // Draw the claimed squares
+        for (let x = 0; x < canvas.width; x += squareSize) {
+            for (let y = 0; y < canvas.height; y += squareSize) {
+                const squareX = Math.floor(x / squareSize);
+                const squareY = Math.floor(y / squareSize);
+                const color = players[`${squareX},${squareY}`];
+                if (color) {
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y, squareSize, squareSize);
+                }
+            }
+        }
+
+        // Draw the players
+        for (const player in players) {
+            const { x, y, color } = players[player];
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, squareSize, squareSize);
+        }
+
+        requestAnimationFrame(render);
+    }
+
+    // Update the player list
+    function updatePlayerList() {
+        playerListItems.innerHTML = '';
+        for (const player in players) {
+            const { name, color } = players[player];
+            const listItem = document.createElement('li');
+            listItem.textContent = name;
+            listItem.style.color = color;
+            playerListItems.appendChild(listItem);
+        }
+    }
+
+    // Connect to the WebSocket server
+    const socket = new WebSocket('ws://localhost:8080/ws');
+
+    socket.addEventListener('open', () => {
+        console.log('Connected to server');
+        // Send player registration information
+        const name = prompt('Enter your name:');
+        const character = prompt('Enter your character:');
+        const color = getRandomColor();
+        socket.send(JSON.stringify({ name, character, color }));
+    });
+
+    socket.addEventListener('message', (event) => {
+        const gameState = JSON.parse(event.data);
+        for (const player in gameState) {
+            players[player] = gameState[player];
+        }
+        updatePlayerList();
+    });
+
+    socket.addEventListener('close', () => {
+        console.log('Disconnected from server');
+    });
+
+    // Handle player movement
+    document.addEventListener('keydown', (event) => {
+        const key = event.key.toLowerCase();
+
+        switch (key) {
+            case 'arrowleft':
+            case 'a':
+                currentDirection = 'left';
+                movePlayer();
+                break;
+            case 'arrowright':
+            case 'd':
+                currentDirection = 'right';
+                movePlayer();
+                break;
+            case 'arrowup':
+            case 'w':
+                currentDirection = 'up';
+                movePlayer();
+                break;
+            case 'arrowdown':
+            case 's':
+                currentDirection = 'down';
+                movePlayer();
+                break;
+        }
+    });
+
+    // Move the player based on the current direction
+    function movePlayer() {
+        const player = players[Object.keys(players)[0]];
+        if (player) {
+            let newX = player.x;
+            let newY = player.y;
+
+            switch (currentDirection) {
+                case 'left':
+                    newX = Math.max(0, player.x - squareSize);
+                    break;
+                case 'right':
+                    newX = Math.min(canvas.width - squareSize, player.x + squareSize);
+                    break;
+                case 'up':
+                    newY = Math.max(0, player.y - squareSize);
+                    break;
+                case 'down':
+                    newY = Math.min(canvas.height - squareSize, player.y + squareSize);
+                    break;
+            }
+
+            // Snap to grid
+            newX = Math.floor(newX / squareSize) * squareSize;
+            newY = Math.floor(newY / squareSize) * squareSize;
+
+            if (newX !== player.x || newY !== player.y) {
+                socket.send(JSON.stringify({ action: 'move', x: newX, y: newY }));
+            }
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>
