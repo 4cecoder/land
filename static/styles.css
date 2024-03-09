@@ -1,0 +1,216 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0c0c0c;
+    color: #fff;
+}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(40, 20px);
+    grid-template-rows: repeat(30, 20px);
+    gap: 1px;
+    background-color: #1c1c1c;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+    position: relative;
+    overflow: hidden;
+    width: 800px;
+    height: 600px;
+}
+.grid-square {
+    width: 20px;
+    height: 20px;
+    background-color: #0c0c0c;
+}
+.player {
+    background-color: #ff00ff;
+    transition: all 0.5s ease-in-out;
+    box-shadow: 0 0 5px #ff00ff;
+}
+.grid-square.touched {
+    animation: fadeTrail 1s forwards;
+}
+.sidebar {
+    width: 200px;
+    padding: 20px;
+    background-color: #1c1c1c;
+    border: 2px solid #00ff00;
+    margin-left: 20px;
+    box-shadow: 0 0 10px #00ff00;
+}
+.sidebar h2 {
+    margin-top: 0;
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+.player-list {
+    list-style-type: none;
+    padding: 0;
+}
+.player-list li {
+    margin-bottom: 10px;
+}
+.player-color {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    vertical-align: middle;
+    box-shadow: 0 0 5px #fff;
+}
+.game-info {
+    margin-top: 20px;
+}
+.start-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #00ff00;
+    color: #0c0c0c;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.start-button:hover {
+    background-color: #0c0c0c;
+    color: #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+.modal-content {
+    background-color: #1c1c1c;
+    margin: 15% auto;
+    padding: 60px;
+    border: 2px solid #00ff00;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 0 10px #00ff00;
+}
+.modal-content h2 {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #0c0c0c;
+    color: #fff;
+    border: 1px solid #00ff00;
+}
+.modal-content button {
+    padding: 10px 20px;
+    background-color: #00ff00;
+    color: #0c0c0c;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.modal-content button:hover {
+    background-color: #0c0c0c;
+    color: #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+@keyframes fadeTrail {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes zoomIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    100% { transform: translate(1px, -2px) rotate(1deg); }
+}
+.player.eliminated {
+    animation: shake 0.5s;
+}
+
+
+.chat-box {
+    margin-top: 20px;
+}
+
+.chat-box h3 {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+.chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    background-color: #0c0c0c;
+    border: 1px solid #00ff00;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.chat-messages div {
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.chat-input {
+    display: flex;
+}
+
+.chat-input input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    background-color: #0c0c0c;
+    color: #fff;
+    border: 1px solid #00ff00;
+}
+
+.chat-input button {
+    padding: 10px 20px;
+    background-color: #00ff00;
+    color: #0c0c0c;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chat-input button:hover {
+    background-color: #0c0c0c;
+    color: #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+
+.chat-input button:disabled {
+    background-color: #1c1c1c;
+    color: #00ff00;
+    cursor: not-allowed;
+}
+
+.chat-input input[type="text"]:disabled {
+    background-color: #1c1c1c;
+    color: #00ff00;
+    cursor: not-allowed;
+}
+
+.chat-input input {
+    margin-right: 10px;
+    background-color: #0c0c0c;
+    border-radius : 5px;
+}
